@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
                             ResultsScreen(viewModel = mainViewModel)
                         }
                         composable("history") {
-                            HistoryScreen(viewModel = mainViewModel)
+                            HistoryScreen(navController = navController, viewModel = mainViewModel)
                         }
                     }
                 }

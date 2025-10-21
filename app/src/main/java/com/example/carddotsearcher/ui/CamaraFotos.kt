@@ -7,7 +7,14 @@ import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -24,16 +31,15 @@ fun CamaraFotos(onPhotoTaken: () -> Unit) {
     val context = LocalContext.current
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
-    var permisoConcedido by remember { mutableStateOf(false) }
 
-    // Lanzador de cámara
+    // Launcher de cámara: Ahora solo actualiza el bitmap
     val takePictureLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
         if (success && imageUri != null) {
             val bmp = MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
             bitmap = bmp
-            onPhotoTaken()
+            // onPhotoTaken() ya no se llama aquí
         }
     }
 
@@ -41,7 +47,6 @@ fun CamaraFotos(onPhotoTaken: () -> Unit) {
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
-        permisoConcedido = granted
         if (granted) {
             val file = File.createTempFile("photo", ".jpg", context.cacheDir)
             file.deleteOnExit()
@@ -56,25 +61,32 @@ fun CamaraFotos(onPhotoTaken: () -> Unit) {
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(32.dp),
+        modifier = Modifier.padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        if (bitmap != null) {
+        if (bitmap == null) {
+            // Estado inicial: solo mostrar el botón para tomar la foto
+            Button(onClick = { cameraPermissionLauncher.launch(Manifest.permission.CAMERA) }) {
+                Text("Tomar foto")
+            }
+        } else {
+            // Estado de confirmación: mostrar la imagen y los dos botones
             Image(
                 bitmap = bitmap!!.asImageBitmap(),
                 contentDescription = "Foto de la carta",
                 modifier = Modifier.size(200.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
-        } else {
-          Button(onClick = {
-              cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-          }) {
-              Text("Tomar foto")
-          }
+            Row {
+                Button(onClick = { onPhotoTaken() }) { // Llama a la búsqueda
+                    Text("Confirmar")
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Button(onClick = { cameraPermissionLauncher.launch(Manifest.permission.CAMERA) }) {
+                    Text("Tomar de Nuevo")
+                }
+            }
         }
     }
 }

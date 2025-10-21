@@ -46,4 +46,18 @@ class MainViewModel : ViewModel() {
             _isLoading.value = false
         }
     }
+
+    fun searchSpecificCard(card: Carta) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            delay(1500) // Simulate network delay
+
+            _selectedCard.value = card
+
+            val stores = repository.findStoresForCard(card)
+            _foundStores.value = stores
+
+            _isLoading.value = false
+        }
+    }
 }

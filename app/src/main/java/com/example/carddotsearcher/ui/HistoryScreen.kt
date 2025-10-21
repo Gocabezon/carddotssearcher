@@ -1,5 +1,6 @@
 package com.example.carddotsearcher.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,10 +14,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.carddotsearcher.viewmodel.MainViewModel
 
 @Composable
-fun HistoryScreen(viewModel: MainViewModel) {
+fun HistoryScreen(navController: NavController, viewModel: MainViewModel) {
     val searchHistory by viewModel.searchHistory.observeAsState(emptyList())
 
     LazyColumn(modifier = Modifier.padding(16.dp)) {
@@ -24,7 +26,11 @@ fun HistoryScreen(viewModel: MainViewModel) {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp),
+                    .padding(vertical = 4.dp)
+                    .clickable { // Make the card clickable
+                        viewModel.searchSpecificCard(card)
+                        navController.navigate("results")
+                    },
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
