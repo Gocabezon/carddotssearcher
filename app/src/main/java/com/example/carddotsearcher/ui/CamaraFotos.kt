@@ -23,8 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import com.example.carddotsearcher.R
 import com.example.carddotsearcher.viewmodel.MainViewModel
 import java.io.File
 
@@ -67,6 +69,14 @@ fun CamaraFotos(viewModel: MainViewModel, onPhotoTaken: () -> Unit) {
         verticalArrangement = Arrangement.Center
     ) {
         if (bitmap == null) {
+            Text(text = "Toma una foto de la carta que vas a buscar", modifier = Modifier.padding(bottom = 16.dp))
+            Image(
+                painter = painterResource(id = R.drawable.dragonblancoojosazules),
+                contentDescription = "dragonblancoojosazules",
+                modifier = Modifier
+                    .size(350.dp)
+                    .padding(bottom = 24.dp)
+            )
             Button(onClick = { cameraPermissionLauncher.launch(Manifest.permission.CAMERA) }) {
                 Text("Tomar foto")
             }
