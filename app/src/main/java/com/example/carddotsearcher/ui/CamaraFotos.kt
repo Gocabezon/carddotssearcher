@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,26 +25,24 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import com.example.carddotsearcher.viewmodel.MainViewModel
 import java.io.File
 
 @Composable
-fun CamaraFotos(onPhotoTaken: () -> Unit) {
+fun CamaraFotos(viewModel: MainViewModel, onPhotoTaken: () -> Unit) {
     val context = LocalContext.current
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
 
-    // Launcher de cámara: Ahora solo actualiza el bitmap
     val takePictureLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
         if (success && imageUri != null) {
             val bmp = MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
             bitmap = bmp
-            // onPhotoTaken() ya no se llama aquí
         }
     }
 
-    // Permiso de cámara
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -70,12 +67,10 @@ fun CamaraFotos(onPhotoTaken: () -> Unit) {
         verticalArrangement = Arrangement.Center
     ) {
         if (bitmap == null) {
-            // Estado inicial: solo mostrar el botón para tomar la foto
             Button(onClick = { cameraPermissionLauncher.launch(Manifest.permission.CAMERA) }) {
                 Text("Tomar foto")
             }
         } else {
-            // Estado de confirmación: mostrar la imagen y los dos botones
             Image(
                 bitmap = bitmap!!.asImageBitmap(),
                 contentDescription = "Foto de la carta",
@@ -83,7 +78,10 @@ fun CamaraFotos(onPhotoTaken: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Row {
-                Button(onClick = { onPhotoTaken() }) { // Llama a la búsqueda
+                Button(onClick = {
+                    viewModel.setPhotoBitmap(bitmap)
+                    onPhotoTaken()
+                }) { 
                     Text("Confirmar")
                 }
                 Spacer(modifier = Modifier.width(16.dp))

@@ -1,5 +1,6 @@
 package com.example.carddotsearcher.viewmodel
 
+import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -27,6 +28,13 @@ class MainViewModel : ViewModel() {
     // For loading state
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
+
+    private val _photoBitmap = MutableLiveData<Bitmap?>()
+    val photoBitmap: LiveData<Bitmap?> = _photoBitmap
+
+    fun setPhotoBitmap(bitmap: Bitmap?) {
+        _photoBitmap.value = bitmap
+    }
 
     fun searchRandomCard() {
         viewModelScope.launch {

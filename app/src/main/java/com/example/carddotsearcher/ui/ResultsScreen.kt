@@ -1,10 +1,12 @@
 package com.example.carddotsearcher.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -14,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import com.example.carddotsearcher.model.Tienda
 import com.example.carddotsearcher.viewmodel.MainViewModel
@@ -23,6 +26,7 @@ fun ResultsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     val foundStores by viewModel.foundStores.observeAsState(emptyList())
     val selectedCard by viewModel.selectedCard.observeAsState()
     val isLoading by viewModel.isLoading.observeAsState(false)
+    val photoBitmap by viewModel.photoBitmap.observeAsState()
 
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         if (isLoading) {
@@ -33,6 +37,13 @@ fun ResultsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                photoBitmap?.let {
+                    Image(
+                        bitmap = it.asImageBitmap(),
+                        contentDescription = "Foto de la carta",
+                        modifier = Modifier.size(200.dp).padding(bottom = 16.dp)
+                    )
+                }
                 selectedCard?.let {
                     Text(text = "Carta seleccionada: ${it.name}", modifier = Modifier.padding(bottom = 16.dp))
                 }
