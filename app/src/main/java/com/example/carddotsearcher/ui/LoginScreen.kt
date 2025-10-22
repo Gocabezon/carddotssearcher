@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -21,6 +22,7 @@ import androidx.navigation.NavController
 fun LoginScreen(navController: NavController) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var showError by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -44,13 +46,24 @@ fun LoginScreen(navController: NavController) {
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
+        if (showError) {
+            Text(
+                text = "Usuario o contraseña no pueden estar vacíos",
+                color = Color.Red,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
         Spacer(modifier = Modifier.height(32.dp))
         Button(onClick = {
-            // Validación simple (admin/admin)
-            if (username == "admin" && password == "admin") {
-                navController.navigate("camera") {
-                    popUpTo("login") { inclusive = true } // Evita volver a la pantalla de login
+            if (username.isNotEmpty() && password.isNotEmpty()) {
+                // Validación simple (admin/admin)
+                if (username == "admin" && password == "admin") {
+                    navController.navigate("camera") {
+                        popUpTo("login") { inclusive = true } // Evita volver a la pantalla de login
+                    }
                 }
+            } else {
+                showError = true
             }
         }) {
             Text("Iniciar Sesión")
