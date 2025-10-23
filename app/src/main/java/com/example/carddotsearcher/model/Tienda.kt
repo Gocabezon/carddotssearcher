@@ -1,3 +1,5 @@
 package com.example.carddotsearcher.model
 
-data class Tienda(val name: String, val cards: List<Carta>)
+import androidx.annotation.DrawableRes
+
+data class Tienda(val name: String, val cards: List<Carta>, @DrawableRes val imageRes: Int)

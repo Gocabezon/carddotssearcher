@@ -1,5 +1,6 @@
 package com.example.carddotsearcher.repository
 
+import com.example.carddotsearcher.R
 import com.example.carddotsearcher.model.Carta
 import com.example.carddotsearcher.model.Tienda
 
@@ -13,10 +14,9 @@ class CardRepository {
     )
 
     private val allStores = listOf(
-        Tienda("Tienda 1", listOf(allCards[0], allCards[2])),
-        Tienda("Tienda 2", listOf(allCards[1])),
-        Tienda("Tienda 3", allCards),
-        Tienda("Tienda 4", listOf(allCards[0]))
+        Tienda("Tienda 1", listOf(allCards[0], allCards[2]), R.drawable.ic_launcher_background),
+        Tienda("Tienda 2", listOf(allCards[1]), R.drawable.ic_launcher_foreground),
+        Tienda("Tienda 3", allCards, R.drawable.ic_launcher_background)
     )
 
     fun findStoresForCard(card: Carta): List<Tienda> {
