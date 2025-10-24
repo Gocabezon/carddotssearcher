@@ -9,7 +9,8 @@ class CardRepository {
     private val allCards = listOf(
         Carta("Mago Oscuro", R.drawable.magooscuro),
         Carta("Dragón Blanco de Ojos Azules", R.drawable.dragonblancoojosazules),
-        Carta("Exodia, el Prohibido", R.drawable.exodiaprohibido)
+        Carta("Exodia, el Prohibido", R.drawable.exodiaprohibido),
+        Carta("Jurrac Meteor", R.drawable.jurracmeteor)
     )
 
     private val allStores = listOf(
