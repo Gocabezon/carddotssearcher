@@ -33,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -48,7 +47,6 @@ fun ResultsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     val foundStores by viewModel.foundStores.observeAsState(emptyList())
     val selectedCard by viewModel.selectedCard.observeAsState()
     val isLoading by viewModel.isLoading.observeAsState(false)
-    val photoBitmap by viewModel.photoBitmap.observeAsState()
     var showImageDialog by remember { mutableStateOf(false) }
     var selectedImageRes by remember { mutableStateOf<Int?>(null) }
 
@@ -84,17 +82,16 @@ fun ResultsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                photoBitmap?.let {
+
+                selectedCard?.let { card ->
                     Image(
-                        bitmap = it.asImageBitmap(),
-                        contentDescription = "Foto de la carta",
+                        painter = painterResource(id = card.imageRes), // Usa la imagen de la carta
+                        contentDescription = "Imagen de la carta ${card.name}",
                         modifier = Modifier
-                            .size(200.dp)
+                            .size(250.dp) // Puedes ajustar el tamaño
                             .padding(bottom = 16.dp)
                     )
-                }
-                selectedCard?.let {
-                    Text(text = "Carta seleccionada: ${it.name}", modifier = Modifier.padding(bottom = 16.dp))
+                    Text(text = "Carta seleccionada: ${card.name}", modifier = Modifier.padding(bottom = 16.dp))
                 }
 
                 if (foundStores.isNotEmpty()) {

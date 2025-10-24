@@ -7,9 +7,9 @@ import com.example.carddotsearcher.model.Tienda
 class CardRepository {
 
     private val allCards = listOf(
-        Carta("Mago Oscuro"),
-        Carta("Dragón Blanco de Ojos Azules"),
-        Carta("Exodia, el Prohibido")
+        Carta("Mago Oscuro", R.drawable.magooscuro),
+        Carta("Dragón Blanco de Ojos Azules", R.drawable.dragonblancoojosazules),
+        Carta("Exodia, el Prohibido", R.drawable.exodiaprohibido)
     )
 
     private val allStores = listOf(

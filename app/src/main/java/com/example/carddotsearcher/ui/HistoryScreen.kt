@@ -22,6 +22,9 @@ fun HistoryScreen(navController: NavController, viewModel: MainViewModel) {
     val searchHistory by viewModel.searchHistory.observeAsState(emptyList())
 
     LazyColumn(modifier = Modifier.padding(16.dp)) {
+        item {
+            Text(text = "Historial de Busquedas")
+        }
         items(searchHistory) { card ->
             Card(
                 modifier = Modifier
