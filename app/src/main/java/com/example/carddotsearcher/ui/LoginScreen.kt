@@ -1,14 +1,7 @@
 package com.example.carddotsearcher.ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -21,12 +14,14 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.carddotsearcher.R
+import com.example.carddotsearcher.repository.UsuarioRepository
 
 @Composable
 fun LoginScreen(navController: NavController) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var showError by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    val repository = remember { UsuarioRepository() }
 
     Column(
         modifier = Modifier
@@ -45,41 +40,63 @@ fun LoginScreen(navController: NavController) {
                 .padding(bottom = 24.dp)
         )
         Text(text = "CardDot Searcher", modifier = Modifier.padding(bottom = 24.dp))
+
         OutlinedTextField(
             value = username,
-            onValueChange = { username = it },
+            onValueChange = { username = it; errorMessage = "" },
             label = { Text("Usuario") },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = { password = it; errorMessage = "" },
             label = { Text("Contraseña") },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
-        if (showError) {
+        if (errorMessage.isNotEmpty()) {
             Text(
-                text = "Usuario o contraseña incorrectos",
+                text = errorMessage,
                 color = Color.Red,
                 modifier = Modifier.padding(top = 8.dp)
             )
         }
         Spacer(modifier = Modifier.height(32.dp))
-        Button(onClick = {
-            if (username.isNotEmpty() && password.isNotEmpty()) {
-                // Validación simple (admin/admin)
-                if (username == "admin" && password == "admin") {
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Button(onClick = {
+                val user = repository.findUser(username, password)
+                if (user != null) {
                     navController.navigate("camera") {
-                        popUpTo("login") { inclusive = true } // Evita volver a la pantalla de login
+                        popUpTo("login") { inclusive = true }
                     }
+                } else {
+                    errorMessage = "Usuario o contraseña incorrectos"
                 }
-            } else {
-                showError = true
+            }) {
+                Text("Iniciar Sesión")
             }
-        }) {
-            Text("Iniciar Sesión")
+            Button(onClick = {
+                if (username.isNotEmpty() && password.isNotEmpty()) {
+                    val success = repository.registerUser(username, password)
+                    if (success) {
+                        // Iniciar sesión automáticamente tras el registro
+                        navController.navigate("camera") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    } else {
+                        errorMessage = "El nombre de usuario ya existe"
+                    }
+                } else {
+                    errorMessage = "Usuario y contraseña no pueden estar vacíos"
+                }
+            }) {
+                Text("Registrarse")
+            }
         }
     }
 }
