@@ -35,6 +35,8 @@ fun LoginScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Text(text = "demo User y PW= admin", modifier = Modifier.padding(bottom=24.dp))
+
         Image(
             painter = painterResource(id = R.drawable.carddotsearcher),
             contentDescription = "Logo",

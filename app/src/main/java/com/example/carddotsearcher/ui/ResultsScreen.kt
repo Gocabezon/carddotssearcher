@@ -81,7 +81,9 @@ fun ResultsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                     Image(
                         bitmap = it.asImageBitmap(),
                         contentDescription = "Foto de la carta",
-                        modifier = Modifier.size(200.dp).padding(bottom = 16.dp)
+                        modifier = Modifier
+                            .size(200.dp)
+                            .padding(bottom = 16.dp)
                     )
                 }
                 selectedCard?.let {
@@ -89,7 +91,12 @@ fun ResultsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                 }
 
                 if (foundStores.isNotEmpty()) {
-                    StoresList(stores = foundStores, userLocation = userLocation)
+                    if (userLocation == null) {
+                        CircularProgressIndicator(modifier = Modifier.size( 16.dp))
+                        Text("Cargando ubicación...", modifier = Modifier.padding(top = 8.dp))
+                    } else {
+                        StoresList(stores = foundStores, userLocation = userLocation)
+                    }
                 } else {
                     Text("No se encontraron tiendas para esta carta.")
                 }
