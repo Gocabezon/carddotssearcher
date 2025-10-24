@@ -9,14 +9,13 @@ class CardRepository {
     private val allCards = listOf(
         Carta("Mago Oscuro"),
         Carta("Dragón Blanco de Ojos Azules"),
-        Carta("Exodia, el Prohibido"),
-        Carta("Red-Eyes Black Dragon")
+        Carta("Exodia, el Prohibido")
     )
 
     private val allStores = listOf(
-        Tienda("Tienda 1", listOf(allCards[0], allCards[2]), R.drawable.ic_launcher_background),
-        Tienda("Tienda 2", listOf(allCards[1]), R.drawable.ic_launcher_foreground),
-        Tienda("Tienda 3", allCards, R.drawable.ic_launcher_background)
+        Tienda("Tienda 1", listOf(allCards[0], allCards[2]), R.drawable.tienda1, -33.45694, -70.64827),
+        Tienda("Tienda 2", listOf(allCards[1]), R.drawable.tienda2, -33.44889, -70.66926),
+        Tienda("Tienda 3", allCards, R.drawable.tienda3, -33.43792, -70.65032)
     )
 
     fun findStoresForCard(card: Carta): List<Tienda> {
