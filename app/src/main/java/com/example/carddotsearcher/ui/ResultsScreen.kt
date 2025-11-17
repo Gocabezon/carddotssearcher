@@ -31,6 +31,8 @@ import androidx.navigation.NavController
 import com.example.carddotsearcher.model.Tienda
 import com.example.carddotsearcher.viewmodel.MainViewModel
 import com.google.android.gms.location.LocationServices
+import coil.compose.AsyncImage
+import com.example.carddotsearcher.R // <-- Esta es la correcta
 
 
 // --- FUNCIONES AUXILIARES ---
@@ -160,14 +162,16 @@ fun ResultsScreen(
             ) {
 
                 selectedCard?.let { card ->
-                    Image(
-                        painter = painterResource(id = card.imageRes),
+                    AsyncImage(
+                        model = card.imageUrl, // Le pasas la URL directamente
                         contentDescription = "Imagen de la carta ${card.name}",
                         modifier = Modifier
                             .size(250.dp)
-                            .padding(bottom = 16.dp)
+                            .padding(bottom = 16.dp),
+                        placeholder = painterResource(id = R.drawable.dragonblancoojosazules), // Muestra esto mientras carga
+                        error = painterResource(id = R.drawable.dragonblancoojosazules) // Muestra esto si hay un error
                     )
-                    Text(text = "Carta seleccionada: ${card.name}", modifier = Modifier.padding(bottom = 16.dp))
+                    Text(text = "Carta encontrada: ${card.name}", modifier = Modifier.padding(bottom = 16.dp))
                 }
 
                 if (foundStores.isNotEmpty()) {
