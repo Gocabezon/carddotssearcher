@@ -1,6 +1,6 @@
 package com.example.carddotsearcher.ui
 
-import androidx.compose.foundation.Image
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,7 +15,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.carddotsearcher.R // <-- Necesaria para el placeholder
 import com.example.carddotsearcher.viewmodel.CartaViewModel
+import coil.compose.AsyncImage
 
 @Composable
 fun CartaScreen(navController: NavController, viewModel: CartaViewModel = viewModel()) {
@@ -68,10 +70,11 @@ fun CartaScreen(navController: NavController, viewModel: CartaViewModel = viewMo
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             // Carga de la Imagen (usando el recurso drawable)
-                            Image(
-                                // ✅ CORRECCIÓN APLICADA AQUÍ: Se utiliza carta.imageRes
-                                painter = painterResource(id = carta.imageRes),
+                            AsyncImage(
+                                model = carta.imageUrl, // Usa la URL de la carta
                                 contentDescription = "Imagen de la carta ${carta.name}",
+                                placeholder = painterResource(id = R.drawable.dragonblancoojosazules), // Muestra esto mientras carga
+                                error = painterResource(id = R.drawable.dragonblancoojosazules), // Muestra esto si falla la carga
                                 modifier = Modifier
                                     .size(64.dp)
                                     .clip(RoundedCornerShape(4.dp)),

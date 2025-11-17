@@ -106,7 +106,7 @@ fun obtenerUbicacion(context: Context, onLocation: (Location?) -> Unit, onFail: 
 }
 
 private fun findBestStore(userLocation: Location): Pair<Tienda, Float>? {
-    val storesWithStock = CardRepository().obtenerTodasLasTiendas().filter { it.cardStock > 0 }
+    val storesWithStock = CardRepository.obtenerTodasLasTiendas().filter { it.cardStock > 0 }
 
     if (storesWithStock.isEmpty()) return null
 
@@ -161,8 +161,7 @@ fun GPS(navController: NavController) {
                         currentLocation = location
                         statusText = "Ubicación obtenida. Buscando tienda más cercana..."
 
-                        val tiendasConStock = CardRepository().obtenerTodasLasTiendas().filter { it.cardStock > 0 }
-                        allStoresWithStock = tiendasConStock
+                        val tiendasConStock = CardRepository.obtenerTodasLasTiendas().filter { it.cardStock > 0 }
 
                         val result = findBestStore(location)
                         nearestStoreResult = result
@@ -226,7 +225,7 @@ fun GPS(navController: NavController) {
                                 currentLocation = location
                                 statusText = "Ubicación obtenida. Buscando tienda más cercana..."
 
-                                val tiendasConStock = CardRepository().obtenerTodasLasTiendas()
+                                val tiendasConStock = CardRepository.obtenerTodasLasTiendas()
                                     .filter { it.cardStock > 0 }
                                 allStoresWithStock = tiendasConStock
 

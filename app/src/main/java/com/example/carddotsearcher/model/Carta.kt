@@ -1,5 +1,9 @@
+// En model/Carta.kt
 package com.example.carddotsearcher.model
 
-import androidx.annotation.DrawableRes
-
-data class Carta(val name: String, @DrawableRes val imageRes: Int)
+// Ya no necesitas @DrawableRes
+data class Carta(
+    val name: String,
+    val type: String,
+    val imageUrl: String // Cambiado de imageRes: Int a imageUrl: String
+)

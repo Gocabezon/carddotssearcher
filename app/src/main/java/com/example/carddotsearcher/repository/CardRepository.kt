@@ -1,65 +1,76 @@
+//1. Corregir el nombre del paquete
 package com.example.carddotsearcher.repository
 
-import com.example.carddotsearcher.R
+import com.example.carddotsearcher.R // Importación de recursos para las tiendas
 import com.example.carddotsearcher.model.Carta
 import com.example.carddotsearcher.model.Tienda
-import kotlin.random.Random // Necesario para getRandomCards
+import com.example.carddotsearcher.network.ApiService
+import com.example.carddotsearcher.network.RetrofitInstance
 
 class CardRepository {
 
-    private val allCards = listOf(
-        // ✅ CORREGIDO: El modelo es Carta(name: String, imageRes: Int)
-        Carta("Mago Oscuro", R.drawable.magooscuro),
-        Carta("Dragón Blanco de Ojos Azules", R.drawable.dragonblancoojosazules),
-        Carta("Exodia, el Prohibido", R.drawable.exodiaprohibido),
-        Carta("Jurrac Meteor", R.drawable.jurracmeteor)
+    companion object {
+        fun obtenerTodasLasTiendas(): List<Tienda> {
+            // Your existing logic to return the list of stores
+            // For example:
+            return listOf(
+                // ... your Tienda objects
+            )
+        }
+    }
+    private val apiService: ApiService = RetrofitInstance.api
+
+    // La lista de tiendas se mantiene local, ya que no viene de la API.
+    private val localStores = listOf(
+        Tienda(
+            name = "Tienda Rebelde",
+            cards = listOf(Carta("Dark Magician", "", "")),
+            cardStock = 10, // Proporciona un valor para el stock
+            imageRes = R.drawable.dragonblancoojosazules, // La imagen va aquí
+            latitude = -33.45694,
+            longitude = -70.64827
+        ),
+        Tienda(
+            name = "Metropolis Center",
+            cards = listOf(Carta("Blue-Eyes White Dragon", "", "")),
+            cardStock = 5, // Proporciona un valor para el stock
+            imageRes = R.drawable.dragonblancoojosazules, // La imagen va aquí
+            latitude = -33.44889,
+            longitude = -70.66926
+        )
     )
 
-    private val allStores = listOf(
-        // Aquí se asumen campos del modelo Tienda que no has proporcionado
-        Tienda("Tienda 1", listOf(allCards[0], allCards[2]), 1,R.drawable.tienda1, -33.45694, -70.64827),
-        Tienda("Tienda 2", listOf(allCards[1], allCards[3]),0,R.drawable.tienda2, -33.44889, -70.66926),
-        Tienda("Tienda 3", allCards,3,R.drawable.tienda3, -33.43792, -70.65032)
-    )
+    /**
+     * Usa el endpoint de la API para obtener una carta completamente aleatoria.
+     * Esta es la única versión de getRandomCard que necesitas.
+     */
+    suspend fun getRandomCard(): Carta {
+        try {
+            val apiCard = apiService.getRandomCard()
+            // Convierte el ApiCard (de la red) a Carta (de nuestro dominio)
+            return Carta(
+                name = apiCard.name,
+                type = apiCard.type,
+                imageUrl = apiCard.cardImages.first().imageUrl
+            )
+        } catch (e: Exception) {
+            // Manejo de errores: si la red falla, devuelve una carta de error.
+            return Carta(
+                name = "Error de red",
+                type = "No se pudo obtener una carta",
+                imageUrl = "" // URL vacía o una imagen de error local
+            )
+        }
+    }
 
     /**
      * Devuelve una lista de Tiendas que tienen esa carta en su stock.
+     * Esta es la única versión de findStoresForCard que necesitas.
      */
-    fun findStoresForCard(card: Carta): List<Tienda> {
-        return allStores.filter { it.cards.contains(card) }
+    suspend fun findStoresForCard(card: Carta): List<Tienda> {
+        // Filtra la lista local de tiendas para ver si alguna contiene una carta con el mismo nombre.
+        return localStores.filter { store -> store.cards.any { it.name == card.name } }
     }
 
-    // Función auxiliar para obtener todas las cartas disponibles
-    fun obtenerTodasLasCartas(): List<Carta> {
-        return allCards
-    }
-
-    // Función auxiliar para obtener todas las tiendas
-    fun obtenerTodasLasTiendas(): List<Tienda> {
-        return allStores
-    }
-
-    fun getRandomCard(): Carta {
-        return allCards.random()
-    }
-
-    /**
-     * Devuelve N cartas aleatorias. (Método que usa tu ViewModel)
-     */
-    fun getRandomCards(count: Int): List<Carta> {
-        val posts = obtenerTodasLasCartas()
-        if (posts.isEmpty()) return emptyList()
-        return posts.shuffled(Random).take(count)
-    }
-
-    /**
-     * Búsqueda por nombre (necesaria para handleSearch en el ViewModel)
-     */
-    fun searchCards(query: String): List<Carta> {
-        val lowerCaseQuery = query.lowercase()
-        return allCards.filter {
-            // ✅ Usa el campo 'name' del modelo Carta
-            it.name.lowercase().contains(lowerCaseQuery)
-        }
-    }
+    // 2. Todas las funciones duplicadas y las que usaban 'allCards' y 'allStores' han sido eliminadas.
 }

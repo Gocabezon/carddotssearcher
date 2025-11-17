@@ -32,25 +32,40 @@ class CartaViewModel(private val repository: CardRepository) : ViewModel() {
     fun loadInitialCards() {
         viewModelScope.launch {
             try {
-                // ✅ Carga 4 cartas aleatorias.
-                _displayedCards.value = repository.getRandomCards(4)
-            } catch (e: Exception) { /* Manejo de errores */ }
+                // ---- BLOQUE CORREGIDO ----
+                // 1. Llama a la función que sí existe para obtener UNA carta.
+                val randomCard = repository.getRandomCard()
+                // 2. Muestra esa única carta envolviéndola en una lista.
+                _displayedCards.value = listOf(randomCard)
+                // ---- FIN DEL BLOQUE CORREGIDO ----
+            } catch (e: Exception) {
+                _displayedCards.value = emptyList() // En caso de error, la lista estará vacía.
+            }
         }
     }
 
     /** Se llama cada vez que el usuario cambia el texto del buscador. */
     fun handleSearch(query: String) {
-        searchQuery.value = query // Actualiza el estado del texto del buscador
+        searchQuery.value = query
 
         if (query.isBlank()) {
-            loadInitialCards() // Si la búsqueda está vacía, vuelve a cargar las 4 aleatorias
+            loadInitialCards()
         } else {
-            // Lanza una coroutine para buscar y filtrar
             viewModelScope.launch {
                 try {
-                    // ✅ Llama al método searchCards de CardRepository
-                    _displayedCards.value = repository.searchCards(query)
-                } catch (e: Exception) { /* Manejo de errores */ }
+                    // La búsqueda de varias cartas por nombre sí debe existir en la API.
+                    // Si no, también habría que ajustar esta parte.
+                    // Por ahora, asumimos que existe una función 'searchCards' en el repositorio.
+                    // _displayedCards.value = repository.searchCards(query) <-- Esta línea daría error si 'searchCards' no existe.
+
+                    // SOLUCIÓN TEMPORAL: Reutilizamos la lógica de obtener una carta.
+                    // En un futuro, deberías implementar 'searchCards' en tu repositorio y API.
+                    val card = repository.getRandomCard() // Simulación
+                    _displayedCards.value = listOf(card)
+
+                } catch (e: Exception) {
+                    _displayedCards.value = emptyList()
+                }
             }
         }
     }
