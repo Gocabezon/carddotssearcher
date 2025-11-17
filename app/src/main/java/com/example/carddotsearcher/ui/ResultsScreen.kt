@@ -9,16 +9,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
@@ -26,24 +17,109 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
 import com.example.carddotsearcher.model.Tienda
 import com.example.carddotsearcher.viewmodel.MainViewModel
 import com.google.android.gms.location.LocationServices
 
+
+// --- FUNCIONES AUXILIARES ---
+private fun hasLocationPermission(context: Context): Boolean {
+    return ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
+}
+
+private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
+    val results = FloatArray(1)
+    Location.distanceBetween(lat1, lon1, lat2, lon2, results)
+    return results[0] / 1000 // Devuelve la distancia en kilómetros
+}
+
+// ---------------------------
+
+@Composable
+fun StoresList(
+    stores: List<Tienda>,
+    userLocation: Location?,
+    navController: NavController,
+    onImageClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(modifier = modifier.padding(16.dp)) {
+        items(stores) { store ->
+            val distance = userLocation?.let {
+                calculateDistance(
+                    it.latitude,
+                    it.longitude,
+                    store.latitude,
+                    store.longitude
+                )
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(id = store.imageRes),
+                        contentDescription = "Imagen de ${store.name}",
+                        modifier = Modifier
+                            .size(64.dp)
+                            .clickable { onImageClick(store.imageRes) }
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            // Navega a la pantalla GPS al hacer clic en el item
+                            .clickable {
+                                navController.navigate("gps")
+                            }
+                    ) {
+                        Text(text = "${store.name} tiene la carta")
+
+                        distance?.let {
+                            Text(
+                                text = "Distancia: %.2f km".format(it),
+                                style = TextStyle(fontSize = 12.sp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 @SuppressLint("MissingPermission")
 @Composable
-fun ResultsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
+fun ResultsScreen(
+    navController: NavController,
+    viewModel: MainViewModel,
+    modifier: Modifier = Modifier
+) {
     val foundStores by viewModel.foundStores.observeAsState(emptyList())
     val selectedCard by viewModel.selectedCard.observeAsState()
     val isLoading by viewModel.isLoading.observeAsState(false)
@@ -60,7 +136,7 @@ fun ResultsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     ) { permissions ->
         if (permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) ||
             permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false)) {
-            // Comprobación de seguridad explícita
+
             if (hasLocationPermission(context)) {
                 fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                     userLocation = location
@@ -85,10 +161,10 @@ fun ResultsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
 
                 selectedCard?.let { card ->
                     Image(
-                        painter = painterResource(id = card.imageRes), // Usa la imagen de la carta
+                        painter = painterResource(id = card.imageRes),
                         contentDescription = "Imagen de la carta ${card.name}",
                         modifier = Modifier
-                            .size(250.dp) // Puedes ajustar el tamaño
+                            .size(250.dp)
                             .padding(bottom = 16.dp)
                     )
                     Text(text = "Carta seleccionada: ${card.name}", modifier = Modifier.padding(bottom = 16.dp))
@@ -99,19 +175,25 @@ fun ResultsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                         CircularProgressIndicator(modifier = Modifier.size( 16.dp))
                         Text("Cargando ubicación...", modifier = Modifier.padding(top = 8.dp))
                     } else {
-                        StoresList(stores = foundStores, userLocation = userLocation, onImageClick = { imageRes ->
-                            selectedImageRes = imageRes
-                            showImageDialog = true
-                        })
+                        StoresList(
+                            stores = foundStores,
+                            userLocation = userLocation,
+                            navController = navController, // Pasa navController
+                            onImageClick = { imageRes ->
+                                selectedImageRes = imageRes
+                                showImageDialog = true
+                            }
+                        )
                     }
                 } else {
                     Text("No se encontraron tiendas para esta carta.")
                 }
+
                 if (showImageDialog && selectedImageRes != null) {
                     Dialog(onDismissRequest = { showImageDialog = false }) {
                         Card(
                             modifier = Modifier
-                                .size(300.dp) // Tamaño del diálogo con la imagen grande
+                                .size(300.dp)
                         ) {
                             Image(
                                 painter = painterResource(id = selectedImageRes!!),
@@ -124,56 +206,4 @@ fun ResultsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
             }
         }
     }
-}
-
-@Composable
-fun StoresList(stores: List<Tienda>, userLocation: Location?, onImageClick: (Int) -> Unit, modifier: Modifier = Modifier) {
-    LazyColumn(modifier = modifier.padding(16.dp)) {
-        items(stores) { store ->
-            val distance = userLocation?.let { calculateDistance(it.latitude, it.longitude, store.latitude, store.longitude) }
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        painter = painterResource(id = store.imageRes),
-                        contentDescription = "Imagen de ${store.name}",
-                        modifier = Modifier
-                            .size(64.dp)
-                            .clickable { onImageClick(store.imageRes) }
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column {
-                        Text(text = "${store.name} tiene la carta")
-                        distance?.let {
-                            Text(text = "Distancia: %.2f km".format(it), style = androidx.compose.ui.text.TextStyle(fontSize = 12.sp))
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-private fun hasLocationPermission(context: Context): Boolean {
-    return ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.ACCESS_COARSE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
-}
-
-private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
-    val results = FloatArray(1)
-    Location.distanceBetween(lat1, lon1, lat2, lon2, results)
-    return results[0] / 1000 // Convertir a kilómetros
 }

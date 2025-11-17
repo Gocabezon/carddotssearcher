@@ -17,7 +17,7 @@ import com.example.carddotsearcher.R
 import com.example.carddotsearcher.repository.UsuarioRepository
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun RegistroScreen(navController: NavController) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
@@ -30,8 +30,7 @@ fun LoginScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        Text("Inicio de Sesion", modifier = Modifier.padding(bottom = 24.dp))
+        Text(text = "Registro de Usuario", modifier = Modifier.padding(bottom = 24.dp))
 
         Image(
             painter = painterResource(id = R.drawable.carddotsearcher),
@@ -40,32 +39,22 @@ fun LoginScreen(navController: NavController) {
                 .size(150.dp)
                 .padding(bottom = 24.dp)
         )
-
-        Text("CardDot Searcher", modifier = Modifier.padding(bottom = 24.dp))
+        Text(text = "CardDot Searcher", modifier = Modifier.padding(bottom = 24.dp))
 
         OutlinedTextField(
             value = username,
-            onValueChange = {
-                username = it
-                errorMessage = ""
-            },
+            onValueChange = { username = it; errorMessage = "" },
             label = { Text("Usuario") },
             modifier = Modifier.fillMaxWidth()
         )
-
-        Spacer(Modifier.height(16.dp))
-
+        Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = password,
-            onValueChange = {
-                password = it
-                errorMessage = ""
-            },
+            onValueChange = { password = it; errorMessage = "" },
             label = { Text("Contraseña") },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
-
         if (errorMessage.isNotEmpty()) {
             Text(
                 text = errorMessage,
@@ -73,43 +62,37 @@ fun LoginScreen(navController: NavController) {
                 modifier = Modifier.padding(top = 8.dp)
             )
         }
-
-        Spacer(Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-
-            // Botón Iniciar Sesión
             Button(onClick = {
-                val user = repository.findUser(username, password)
-                if (user != null) {
+
+                if (username.isBlank() || password.isBlank()) {
+                    // Usuario o contraseña vacíos → enviar a registro
+                    navController.navigate("login") {
+                        popUpTo("registro") { inclusive = false }
+                    }
+                    return@Button
+                }
+
+                // Intentar registrar
+                val success = repository.registerUser(username, password)
+
+                if (success) {
+                    // Registro correcto → ir a cámara
                     navController.navigate("camera") {
                         popUpTo("login") { inclusive = true }
                     }
                 } else {
-                    errorMessage = "Usuario o contraseña incorrectos"
+                    // Usuario ya existe
+                    errorMessage = "El nombre de usuario ya existe"
                 }
+
             }) {
-                Text("Iniciar Sesión")
-            }
-            // Botón Registrar
-            Button(onClick = {
-                if (username.isNotEmpty() && password.isNotEmpty()) {
-                    val success = repository.registerUser(username, password)
-                    if (success) {
-                        navController.navigate("camera") {
-                            popUpTo("login") { inclusive = true }
-                        }
-                    } else {
-                        errorMessage = "El nombre de usuario ya existe"
-                    }
-                } else {
-                    errorMessage = "Usuario y contraseña no pueden estar vacíos"
-                }
-            }) {
-                Text("Registrar")
+                Text("Registrarse")
             }
         }
     }
