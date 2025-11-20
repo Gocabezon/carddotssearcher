@@ -68,4 +68,8 @@ class MainViewModel : ViewModel() {
             _isLoading.value = false
         }
     }
+
+    fun getAllStores(): List<Tienda> {
+        return repository.getAllStores() // Llama a la nueva función pública del repositorio
+    }
 }

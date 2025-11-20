@@ -11,7 +11,7 @@ data class ApiResponse(
 data class ApiCard(
     val name: String,
     val type: String,
-    @Json(name = "card_images") val cardImages: List<CardImage>
+    @Json(name = "card_images") val cardImages: List<CardImage>?
 )
 
 // 3. Representa el objeto dentro de la lista "card_images"

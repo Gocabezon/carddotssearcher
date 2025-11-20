@@ -1,6 +1,8 @@
 // En network/ApiService.kt
 package com.example.carddotsearcher.network
 
+import okhttp3.ResponseBody
+
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -12,6 +14,5 @@ interface ApiService {
     suspend fun getCardInfo(@Query("name") cardName: String): ApiResponse
 
     @GET("api/v7/randomcard.php")
-    suspend fun getRandomCard(): ApiCard
-    // La API no tiene un endpoint "random" directo, así que lo simularemos en el repositorio
+    suspend fun getRandomCardAsJson(): ResponseBody // Devuelve un elemento JSON genérico
 }

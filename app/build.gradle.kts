@@ -79,6 +79,10 @@ dependencies {
 
     // 8. Localización
     implementation(libs.play.services.location)
+    implementation(libs.androidx.tools.core)
+
+    // Json
+    implementation("com.google.code.gson:gson:2.10.1")
 
     // 9. Testing (mantenido)
     testImplementation(libs.junit)

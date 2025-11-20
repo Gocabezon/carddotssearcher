@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
                             HistoryScreen(navController = navController, viewModel = mainViewModel)
                         }
                         composable("gps"){
-                            GPS(navController = navController)
+                            GPS(navController = navController, viewModel = mainViewModel)
                         }
                     }
                 }
