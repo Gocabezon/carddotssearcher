@@ -4,6 +4,7 @@ package com.example.carddotsearcher.repository
 
 import com.example.carddotsearcher.R
 import com.example.carddotsearcher.model.Carta
+import com.example.carddotsearcher.model.InventoryItem // <-- Importa el nuevo modelo
 import com.example.carddotsearcher.model.Tienda
 import com.example.carddotsearcher.network.ApiCard // <-- Se añade la importación correcta
 import com.example.carddotsearcher.network.ApiService
@@ -35,17 +36,38 @@ class CardRepository {
     private val allStores: List<Tienda> = listOf(
         Tienda(
             name = "Tienda Rebelde",
-            cards = listOf(Carta(name = "Dark Magician", type = "", imageUrl = "")),
-            cardStock = 10,
-            imageRes = R.drawable.tienda1, // Asegúrate de que 'tienda1' existe en res/drawable
+            // Ahora usamos una lista de 'InventoryItem'
+            inventory = listOf(
+                InventoryItem(
+                    card = Carta(name = "Dark Magician", type = "", imageUrl = ""),
+                    price = 25.50,
+                    stock = 3
+                ),
+                InventoryItem(
+                    card = Carta(name = "Blue-Eyes White Dragon", type = "", imageUrl = ""),
+                    price = 30.00,
+                    stock = 1
+                )
+            ),
+            imageRes = R.drawable.tienda1,
             latitude = -33.45694,
             longitude = -70.64827
         ),
         Tienda(
             name = "Metropolis Center",
-            cards = listOf(Carta(name = "Blue-Eyes White Dragon", type = "", imageUrl = "")),
-            cardStock = 5,
-            imageRes = R.drawable.tienda2, // Asegúrate de que 'tienda2' existe en res/drawable
+            inventory = listOf(
+                InventoryItem(
+                    card = Carta(name = "Dark Magician", type = "", imageUrl = ""),
+                    price = 22.90, // ¡Precio diferente para la misma carta!
+                    stock = 5
+                ),
+                InventoryItem(
+                    card = Carta(name = "Exodia the Forbidden One", type = "", imageUrl = ""),
+                    price = 50.00,
+                    stock = 1
+                )
+            ),
+            imageRes = R.drawable.tienda2,
             latitude = -33.44889,
             longitude = -70.66926
         )
@@ -99,6 +121,10 @@ class CardRepository {
     }
 
     suspend fun findStoresForCard(card: Carta): List<Tienda> {
-        return allStores.filter { store -> store.cards.any { it.name == card.name } }
+        return allStores.filter { store ->
+            store.inventory.any { inventoryItem ->
+                inventoryItem.card.name == card.name
+            }
+        }
     }
 }
