@@ -1,6 +1,7 @@
 // En repository/CardRepository.kt
 package com.example.carddotsearcher.repository
 
+import androidx.compose.ui.input.key.type
 import com.example.carddotsearcher.R
 import com.example.carddotsearcher.model.Carta
 import com.example.carddotsearcher.model.InventoryItem
@@ -23,7 +24,7 @@ class CardRepository {
     private val apiResponseAdapter: JsonAdapter<ApiResponse> = moshi.adapter(ApiResponse::class.java)
 
     // --- PUNTO CLAVE 1: La lista de tiendas ahora se genera dinámicamente con datos locales ---
-    private val allStores: List<Tienda> by lazy {
+     val allStores: List<Tienda> by lazy {
         // Usamos 'by lazy' para que esta lógica de creación se ejecute solo una vez.
         generateMockStores()
     }
@@ -50,8 +51,8 @@ class CardRepository {
 
         // Tienda 2: Metropolis Center
         val metropolisInventory = mutableListOf<InventoryItem>()
-        // Asignamos otras 50 cartas aleatorias a esta tienda
-        repeat(50) {
+        // Asignamos otras 60 cartas aleatorias a esta tienda
+        repeat(60) {
             val randomCard = allMockCards.random()
             metropolisInventory.add(
                 InventoryItem(
@@ -83,9 +84,7 @@ class CardRepository {
     /**
      * FUNCIÓN PÚBLICA para acceder a las tiendas.
      */
-    fun getAllStores(): List<Tienda> {
-        return allStores
-    }
+
 
     /**
      * Usa el endpoint de la API para obtener UNA carta completamente aleatoria.
@@ -114,6 +113,31 @@ class CardRepository {
         } catch (e: Exception) {
             e.printStackTrace()
             return Carta(name = "Error de red", type = "No se pudo obtener una carta", imageUrl = "")
+        }
+    }
+    suspend fun searchCardByName(cardName: String): Carta? { // Devuelve Carta? (nullable) por si no se encuentra
+        try {
+            // 1. Llama al endpoint de búsqueda por nombre.
+            val apiResponse = apiService.getCardInfo(cardName)
+
+            // 2. La respuesta es una lista, tomamos el primer resultado.
+            val apiCard = apiResponse.data.firstOrNull()
+
+            // 3. Si se encontró una carta y tiene imagen, la transformamos y devolvemos.
+            if (apiCard != null && !apiCard.cardImages.isNullOrEmpty()) {
+                return Carta(
+                    name = apiCard.name,
+                    type = apiCard.type,
+                    imageUrl = apiCard.cardImages.first().imageUrl
+                )
+            }
+            // 4. Si no se encuentra la carta o no tiene imagen, devolvemos null.
+            return null
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // Si hay un error de red, también devolvemos null.
+            return null
         }
     }
 

@@ -69,7 +69,38 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    fun searchCardByName(cardName: String) {
+        if (cardName.isBlank()) return // No buscar si el texto está vacío
+
+        viewModelScope.launch {
+            _isLoading.value = true
+            delay(500) // Un pequeño delay para simular la búsqueda
+
+            // 1. Llama a la nueva función del repositorio.
+            val foundCard = repository.searchCardByName(cardName)
+
+            if (foundCard != null) {
+                // 2. Si se encontró la carta, actualiza el estado.
+                _selectedCard.value = foundCard
+                _foundStores.value = repository.findStoresForCard(foundCard)
+
+                // 3. (Opcional) Añade la carta encontrada al historial.
+                val currentHistory = _searchHistory.value ?: emptyList()
+                if (!currentHistory.any { it.name == foundCard.name }) {
+                    _searchHistory.value = listOf(foundCard) + currentHistory
+                }
+            } else {
+                // 4. Si no se encontró, puedes decidir qué hacer.
+                // Por ejemplo, no cambiar la carta actual o mostrar un mensaje.
+                // Por ahora, no haremos nada para no perder la carta anterior.
+                // En una app real, aquí se podría mostrar un Toast con "Carta no encontrada".
+            }
+
+            _isLoading.value = false
+        }
+    }
+
     fun getAllStores(): List<Tienda> {
-        return repository.getAllStores() // Llama a la nueva función pública del repositorio
+        return repository.allStores // Llama a la nueva función pública del repositorio
     }
 }

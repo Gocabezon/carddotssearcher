@@ -1,3 +1,4 @@
+// En ui/theme/Gps.kt
 package com.example.carddotsearcher.ui.theme
 
 import android.Manifest
@@ -10,10 +11,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -27,28 +25,35 @@ import com.example.carddotsearcher.model.Tienda
 import com.example.carddotsearcher.viewmodel.MainViewModel
 import com.google.android.gms.location.LocationServices
 
-// --- LÓGICA DE LA PANTALLA GPS ---
+// --- CLASE DE DATOS AUXILIAR ---
+data class FindStoreResult(
+    val userLocation: Location,
+    val nearestStore: Tienda?,
+    val distance: Float?
+)
+
+// --- Composable Principal ---
 @Composable
 fun GPS(navController: NavController, viewModel: MainViewModel) {
     val context = LocalContext.current
 
-    // 1. ESTADOS PARA GESTIONAR LA UI
+    // Estados para gestionar la UI
     var userLocation by remember { mutableStateOf<Location?>(null) }
-    var nearestStore by remember { mutableStateOf<Tienda?>(null) }
+    var nearestStoreResult by remember { mutableStateOf<FindStoreResult?>(null) }
+    var selectedStore by remember { mutableStateOf<Tienda?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var statusText by remember { mutableStateOf("Toca 'Buscar Tienda Cercana' para empezar.") }
+    var expanded by remember { mutableStateOf(false) }
 
-    // 2. OBTENER LAS TIENDAS DESDE EL VIEWMODEL (Forma correcta)
-    // Esto es más eficiente, se obtiene la lista una sola vez.
-    val storesWithStock = remember { viewModel.getAllStores().filter { it.cardStock > 0 } }
+    // --- CAMBIO 1: Obtiene TODAS las tiendas, sin filtrar por un stock que ya no existe. ---
+    val allStores = remember { viewModel.getAllStores() }
 
-    // 3. LAUNCHER PARA PERMISOS (Igual que en ResultsScreen, simple y efectivo)
+    // Launcher para permisos (sin cambios, ya es correcto)
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         if (permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false)) {
-            // Permiso concedido, ahora obtenemos la ubicación.
-            findNearestStore(context, storesWithStock,
+            findNearestStore(context, allStores,
                 onLoading = {
                     isLoading = true
                     statusText = "Permiso concedido. Obteniendo ubicación..."
@@ -56,11 +61,12 @@ fun GPS(navController: NavController, viewModel: MainViewModel) {
                 onResult = { result ->
                     isLoading = false
                     userLocation = result.userLocation
-                    nearestStore = result.nearestStore
+                    nearestStoreResult = result
+                    selectedStore = result.nearestStore
                     statusText = if (result.nearestStore != null) {
                         "¡Tienda más cercana encontrada!"
                     } else {
-                        "Ubicación obtenida, pero no se encontraron tiendas con stock."
+                        "Ubicación obtenida, pero no hay tiendas en la lista."
                     }
                 },
                 onError = { error ->
@@ -69,13 +75,12 @@ fun GPS(navController: NavController, viewModel: MainViewModel) {
                 }
             )
         } else {
-            // Permiso denegado.
-            statusText = "Permiso de ubicación denegado. No se puede buscar la tienda."
+            statusText = "Permiso de ubicación denegado."
             Toast.makeText(context, statusText, Toast.LENGTH_LONG).show()
         }
     }
 
-    // 4. DISEÑO DE LA PANTALLA (Column con la información)
+    // Diseño de la pantalla
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -83,7 +88,6 @@ fun GPS(navController: NavController, viewModel: MainViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Muestra el estado actual
         Text(
             text = statusText,
             style = MaterialTheme.typography.titleMedium,
@@ -91,24 +95,49 @@ fun GPS(navController: NavController, viewModel: MainViewModel) {
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
-        // Muestra un indicador de carga si está buscando
         if (isLoading) {
             CircularProgressIndicator()
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        // Muestra el botón para iniciar la búsqueda
-        Button(
-            onClick = { locationPermissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)) },
-            enabled = !isLoading
-        ) {
-            Text("Buscar Tienda Cercana")
+        } else {
+            Button(
+                onClick = { locationPermissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)) }
+            ) {
+                Text("Buscar Tienda Cercana")
+            }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Muestra la información de la tienda encontrada
-        nearestStore?.let { store ->
+        // Muestra un selector de tiendas si se ha encontrado al menos una
+        nearestStoreResult?.let {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Selecciona una tienda:")
+
+            Box {
+                Button(onClick = { expanded = true }) {
+                    Text(selectedStore?.name ?: "Seleccionar tienda")
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    allStores.forEach { store ->
+                        DropdownMenuItem(
+                            // --- CAMBIO 2: Mostramos el número de cartas en inventario ---
+                            text = { Text("${store.name} - ${store.inventory.size} tipos de cartas") },
+                            onClick = {
+                                selectedStore = store
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Muestra los detalles de la tienda seleccionada
+        selectedStore?.let { store ->
             val distanceKm = userLocation?.let {
                 val storeLocation = Location("").apply {
                     latitude = store.latitude
@@ -117,11 +146,19 @@ fun GPS(navController: NavController, viewModel: MainViewModel) {
                 it.distanceTo(storeLocation) / 1000f
             }
 
-            Text("Tienda Encontrada:", style = MaterialTheme.typography.headlineSmall)
-            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Tienda Seleccionada:",
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
             Text("Nombre: ${store.name}")
             distanceKm?.let { Text("Distancia: %.2f km".format(it)) }
-            Text("Stock: ${store.cardStock}")
+
+            // --- CAMBIO 3: Ya no mostramos un 'stock' general. ---
+            // En su lugar, podrías mostrar el número total de cartas disponibles.
+            val totalStock = store.inventory.sumOf { it.stock }
+            Text("Cartas totales en stock: $totalStock")
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(onClick = { showDirections(context, store) }) {
@@ -131,14 +168,7 @@ fun GPS(navController: NavController, viewModel: MainViewModel) {
     }
 }
 
-// --- CLASE DE DATOS AUXILIAR PARA UN RESULTADO LIMPIO ---
-data class FindStoreResult(
-    val userLocation: Location,
-    val nearestStore: Tienda?,
-    val distance: Float?
-)
-
-// --- FUNCIÓN DE LÓGICA PRINCIPAL (Separada de la UI) ---
+// --- FUNCIÓN DE LÓGICA (Separada de la UI) ---
 @SuppressLint("MissingPermission")
 private fun findNearestStore(
     context: Context,
@@ -153,7 +183,7 @@ private fun findNearestStore(
     fusedLocationClient.lastLocation
         .addOnSuccessListener { location: Location? ->
             if (location == null) {
-                onError("No se pudo obtener la última ubicación conocida. Activa el GPS y vuelve a intentarlo.")
+                onError("No se pudo obtener la ubicación. Activa el GPS y vuelve a intentarlo.")
                 return@addOnSuccessListener
             }
 
@@ -162,7 +192,7 @@ private fun findNearestStore(
                 return@addOnSuccessListener
             }
 
-            // Encuentra la tienda más cercana
+            // Encuentra la tienda más cercana (sin cambios, ya era correcto)
             val nearestStoreWithDistance = stores.map { store ->
                 val storeLocation = Location("").apply {
                     latitude = store.latitude
@@ -179,7 +209,7 @@ private fun findNearestStore(
         }
 }
 
-// Función auxiliar para abrir Google Maps (sin cambios)
+// --- FUNCIÓN AUXILIAR (sin cambios) ---
 private fun showDirections(context: Context, store: Tienda) {
     val uri = "google.navigation:q=${store.latitude},${store.longitude}"
     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
