@@ -1,126 +1,127 @@
-
+// En repository/CardRepository.kt
 package com.example.carddotsearcher.repository
-
 
 import com.example.carddotsearcher.R
 import com.example.carddotsearcher.model.Carta
-import com.example.carddotsearcher.model.InventoryItem // <-- Importa el nuevo modelo
+import com.example.carddotsearcher.model.InventoryItem
 import com.example.carddotsearcher.model.Tienda
-import com.example.carddotsearcher.network.ApiCard // <-- Se añade la importación correcta
-import com.example.carddotsearcher.network.ApiService
 
 import com.example.carddotsearcher.network.ApiResponse
+import com.example.carddotsearcher.network.ApiService
 import com.example.carddotsearcher.network.RetrofitInstance
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types // <-- Se usa la importación correcta de Moshi
+
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import okhttp3.ResponseBody
+
+import kotlin.random.Random
 
 class CardRepository {
 
     private val apiService: ApiService = RetrofitInstance.api
+    private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+    private val apiResponseAdapter: JsonAdapter<ApiResponse> = moshi.adapter(ApiResponse::class.java)
 
-    private val moshi = Moshi.Builder()
-        .add(KotlinJsonAdapterFactory())
-        .build()
+    // --- PUNTO CLAVE 1: La lista de tiendas ahora se genera dinámicamente con datos locales ---
+    private val allStores: List<Tienda> by lazy {
+        // Usamos 'by lazy' para que esta lógica de creación se ejecute solo una vez.
+        generateMockStores()
+    }
 
-    // --- LÍNEA CORREGIDA ---
-    // Ahora usa la clase 'Types' directamente de Moshi, no de 'privacysandbox'.
-    private val cardListAdapter: JsonAdapter<List<ApiCard>> = moshi.adapter(
-        Types.newParameterizedType(List::class.java, ApiCard::class.java)
-    )
+    /**
+     * Genera una lista de tiendas con inventarios aleatorios a partir de nuestros datos mock.
+     */
+    private fun generateMockStores(): List<Tienda> {
+        val allMockCards = MockCardDataSource.mockCards
 
-    private val singleCardAdapter: JsonAdapter<ApiCard> = moshi.adapter(ApiCard::class.java)
-
-    private val allStores: List<Tienda> = listOf(
-        Tienda(
-            name = "Tienda Rebelde",
-            // Ahora usamos una lista de 'InventoryItem'
-            inventory = listOf(
+        // Tienda 1: Tienda Rebelde
+        val rebeldeInventory = mutableListOf<InventoryItem>()
+        // Asignamos 50 cartas aleatorias a esta tienda
+        repeat(50) {
+            val randomCard = allMockCards.random()
+            rebeldeInventory.add(
                 InventoryItem(
-                    card = Carta(name = "Dark Magician", type = "", imageUrl = ""),
-                    price = 25.50,
-                    stock = 3
-                ),
-                InventoryItem(
-                    card = Carta(name = "Blue-Eyes White Dragon", type = "", imageUrl = ""),
-                    price = 30.00,
-                    stock = 1
+                    card = randomCard,
+                    price = Random.nextDouble(1.0, 50.0), // Precio aleatorio entre 1 y 50
+                    stock = Random.nextInt(1, 10)         // Stock aleatorio entre 1 y 9
                 )
-            ),
-            imageRes = R.drawable.tienda1,
-            latitude = -33.45694,
-            longitude = -70.64827
-        ),
-        Tienda(
-            name = "Metropolis Center",
-            inventory = listOf(
+            )
+        }
+
+        // Tienda 2: Metropolis Center
+        val metropolisInventory = mutableListOf<InventoryItem>()
+        // Asignamos otras 50 cartas aleatorias a esta tienda
+        repeat(50) {
+            val randomCard = allMockCards.random()
+            metropolisInventory.add(
                 InventoryItem(
-                    card = Carta(name = "Dark Magician", type = "", imageUrl = ""),
-                    price = 22.90, // ¡Precio diferente para la misma carta!
-                    stock = 5
-                ),
-                InventoryItem(
-                    card = Carta(name = "Exodia the Forbidden One", type = "", imageUrl = ""),
-                    price = 50.00,
-                    stock = 1
+                    card = randomCard,
+                    price = Random.nextDouble(0.5, 60.0), // Rango de precios diferente
+                    stock = Random.nextInt(1, 5)          // Stock más bajo
                 )
+            )
+        }
+
+        return listOf(
+            Tienda(
+                name = "Tienda Rebelde",
+                inventory = rebeldeInventory.distinctBy { it.card.name }, // Evita duplicados de la misma carta
+                imageRes = R.drawable.tienda1,
+                latitude = -33.45694,
+                longitude = -70.64827
             ),
-            imageRes = R.drawable.tienda2,
-            latitude = -33.44889,
-            longitude = -70.66926
+            Tienda(
+                name = "Metropolis Center",
+                inventory = metropolisInventory.distinctBy { it.card.name }, // Evita duplicados
+                imageRes = R.drawable.tienda2,
+                latitude = -33.44889,
+                longitude = -70.66926
+            )
         )
-    )
+    }
 
+    /**
+     * FUNCIÓN PÚBLICA para acceder a las tiendas.
+     */
     fun getAllStores(): List<Tienda> {
         return allStores
     }
 
+    /**
+     * Usa el endpoint de la API para obtener UNA carta completamente aleatoria.
+     * Esta es la única parte que usa la red.
+     */
     suspend fun getRandomCard(): Carta {
         try {
-            // --- PUNTO CLAVE: Adaptador para la respuesta completa de la API ---
-            val apiResponseAdapter: JsonAdapter<ApiResponse> = moshi.adapter(ApiResponse::class.java)
-
             val responseBody = apiService.getRandomCardAsJson()
             val jsonString = responseBody.string()
 
-            // 1. Parsea el JSON completo usando el adaptador correcto (ApiResponse).
             val apiResponse = apiResponseAdapter.fromJson(jsonString)
-
-            // 2. Extrae la lista de cartas de la respuesta.
             val cardList = apiResponse?.data
-
-            // 3. Filtra la lista para quedarte solo con cartas que tengan imágenes.
             val cardsWithImages = cardList?.filter { !it.cardImages.isNullOrEmpty() }
 
-            // 4. Si la lista filtrada no está vacía, elige una carta al azar.
             if (!cardsWithImages.isNullOrEmpty()) {
-                val randomApiCard = cardsWithImages.first() // La API randomcard.php solo devuelve una
-
-                // 5. Convierte el ApiCard a tu modelo de dominio Carta.
+                val randomApiCard = cardsWithImages.first()
+                // La API nos da la URL de la imagen, la usamos para el objeto Carta que devolveremos
                 return Carta(
                     name = randomApiCard.name,
                     type = randomApiCard.type,
                     imageUrl = randomApiCard.cardImages!!.first().imageUrl
                 )
             } else {
-                // Si la carta aleatoria no tenía imagen, reintenta.
-                return getRandomCard()
+                return getRandomCard() // Reintento si la carta no tiene imagen
             }
-
         } catch (e: Exception) {
             e.printStackTrace()
-            // Devuelve la carta de error si todo falla.
-            return Carta(
-                name = "Error de red",
-                type = "No se pudo obtener una carta",
-                imageUrl = ""
-            )
+            return Carta(name = "Error de red", type = "No se pudo obtener una carta", imageUrl = "")
         }
     }
 
-    suspend fun findStoresForCard(card: Carta): List<Tienda> {
+    /**
+     * Devuelve una lista de Tiendas que tienen esa carta en su stock.
+     * Esta lógica ahora funciona con el inventario generado localmente.
+     */
+    fun findStoresForCard(card: Carta): List<Tienda> {
         return allStores.filter { store ->
             store.inventory.any { inventoryItem ->
                 inventoryItem.card.name == card.name
