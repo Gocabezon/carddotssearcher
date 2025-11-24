@@ -67,7 +67,8 @@ fun StoresList(
 
     LazyColumn(modifier = modifier.padding(horizontal = 16.dp)) {
         items(stores) { store ->
-            val inventoryItem = store.inventory.find { it.card.name == selectedCard.name }
+            val inventoryItem = store.inventory.find {
+                it.cardName.equals(selectedCard.name, ignoreCase = true) }
             val distance = userLocation?.let {
                 calculateDistance(it.latitude, it.longitude, store.latitude, store.longitude)
             }
@@ -143,8 +144,7 @@ fun ResultsScreen(
         if (isLoading) {
             CircularProgressIndicator()
         } else {
-            // --- CÓDIGO RESTAURADO ---
-            // Volvemos a un Column simple. La responsabilidad de esta pantalla es solo mostrar.
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()

@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.carddotsearcher.model.Carta
 import com.example.carddotsearcher.model.Tienda
 import com.example.carddotsearcher.repository.CardRepository
+import com.example.carddotsearcher.repository.MockCardDataSource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -38,20 +39,11 @@ class MainViewModel : ViewModel() {
 
     fun searchRandomCard() {
         viewModelScope.launch {
-            _isLoading.value = true
-            delay(1500) // Simulate network delay
+            // 1. Obtener un nombre de carta aleatorio de la lista local.
+            val randomCardName = MockCardDataSource.mockCards.random().name
 
-            val randomCard = repository.getRandomCard()
-            _selectedCard.value = randomCard
 
-            val stores = repository.findStoresForCard(randomCard)
-            _foundStores.value = stores
-
-            // Add to history
-            val currentHistory = _searchHistory.value ?: emptyList()
-            _searchHistory.value = listOf(randomCard) + currentHistory
-
-            _isLoading.value = false
+            searchCardByName(randomCardName)
         }
     }
 
@@ -70,33 +62,31 @@ class MainViewModel : ViewModel() {
     }
 
     fun searchCardByName(cardName: String) {
-        if (cardName.isBlank()) return // No buscar si el texto está vacío
+        if (cardName.isBlank()) return
 
         viewModelScope.launch {
             _isLoading.value = true
-            delay(500) // Un pequeño delay para simular la búsqueda
 
-            // 1. Llama a la nueva función del repositorio.
+
+            // 1. Llama a la función del repositorio que se conecta a la API.
             val foundCard = repository.searchCardByName(cardName)
 
             if (foundCard != null) {
-                // 2. Si se encontró la carta, actualiza el estado.
+                // 2. Si la API encontró la carta, actualiza la UI.
                 _selectedCard.value = foundCard
                 _foundStores.value = repository.findStoresForCard(foundCard)
-
-                // 3. (Opcional) Añade la carta encontrada al historial.
-                val currentHistory = _searchHistory.value ?: emptyList()
-                if (!currentHistory.any { it.name == foundCard.name }) {
-                    _searchHistory.value = listOf(foundCard) + currentHistory
-                }
-            } else {
-                // 4. Si no se encontró, puedes decidir qué hacer.
-                // Por ejemplo, no cambiar la carta actual o mostrar un mensaje.
-                // Por ahora, no haremos nada para no perder la carta anterior.
-                // En una app real, aquí se podría mostrar un Toast con "Carta no encontrada".
+                // 3. Añade la carta al historial.
+                addCardToHistory(foundCard)
             }
-
+            // Si 'foundCard' es null, no se hace nada y el usuario no ve cambios.
             _isLoading.value = false
+        }
+    }
+
+    private fun addCardToHistory(card: Carta) {
+        val currentHistory = _searchHistory.value ?: emptyList()
+        if (!currentHistory.any { it.name == card.name }) {
+            _searchHistory.value = listOf(card) + currentHistory
         }
     }
 

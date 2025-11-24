@@ -38,7 +38,7 @@ object MockCardDataSource {
         Carta(name="Morphing Jar", type="", imageUrl=""),
         Carta(name="Ash Blossom & Joyous Spring", type="", imageUrl=""),
         Carta(name="Effect Veiler", type="", imageUrl=""),
-        Carta(name="Maxx \"C\"", type="", imageUrl=""),
+        Carta(name="Maxx C", type="", imageUrl=""),
 
         // Magias Icónicas
         Carta(name="Pot of Greed", type="", imageUrl=""),
@@ -73,7 +73,7 @@ object MockCardDataSource {
         Carta(name="Elemental HERO Neos", type="", imageUrl=""),
         Carta(name="Elemental HERO Flame Wingman", type="", imageUrl=""),
 
-                // Extra
+        // Extra
         Carta(name="Time Wizard", type="", imageUrl=""),
         Carta(name="Scapegoat", type="", imageUrl=""),
         // Pega estas cartas al final de tu lista 'mockCards' existente.
@@ -156,96 +156,98 @@ object MockCardDataSource {
         Carta(name="Beatrice, Lady of the Eternal", type="", imageUrl=""),
 
 // --- Arquetipo "Nekroz" ---
-    Carta(name="Nekroz of Brionac", type="", imageUrl=""),
-    Carta(name="Nekroz of Trishula", type="", imageUrl=""),
-    Carta(name="Nekroz of Unicore", type="", imageUrl=""),
-    Carta(name="Nekroz Cycle", type="", imageUrl=""),
-    Carta(name="Shurit, Strategist of the Nekroz", type="", imageUrl=""),
+        Carta(name="Nekroz of Brionac", type="", imageUrl=""),
+        Carta(name="Nekroz of Trishula", type="", imageUrl=""),
+        Carta(name="Nekroz of Unicore", type="", imageUrl=""),
+        Carta(name="Nekroz Cycle", type="", imageUrl=""),
+        Carta(name="Shurit, Strategist of the Nekroz", type="", imageUrl=""),
 
 // --- Arquetipo "Tellarknight" ---
-    Carta(name="Satellarknight Deneb", type="", imageUrl=""),
-    Carta(name="Satellarknight Altair", type="", imageUrl=""),
-    Carta(name="Stellarknight Triverr", type="", imageUrl=""),
+        Carta(name="Satellarknight Deneb", type="", imageUrl=""),
+        Carta(name="Satellarknight Altair", type="", imageUrl=""),
+        Carta(name="Stellarknight Triverr", type="", imageUrl=""),
 
 // --- Arquetipo "Lightsworn" ---
-    Carta(name="Judgment Dragon", type="", imageUrl=""),
-    Carta(name="Raiden, Hand of the Lightsworn", type="", imageUrl=""),
-    Carta(name="Lumina, Lightsworn Summoner", type="", imageUrl=""),
-    Carta(name="Charge of the Light Brigade", type="", imageUrl=""),
-    Carta(name="Michael, the Arch-Lightsworn", type="", imageUrl=""),
+        Carta(name="Judgment Dragon", type="", imageUrl=""),
+        Carta(name="Raiden, Hand of the Lightsworn", type="", imageUrl=""),
+        Carta(name="Lumina, Lightsworn Summoner", type="", imageUrl=""),
+        Carta(name="Charge of the Light Brigade", type="", imageUrl=""),
+        Carta(name="Michael, the Arch-Lightsworn", type="", imageUrl=""),
 
 // --- Arquetipo "HERO" (más) ---
-    Carta(name="Destiny HERO - Malicious", type="", imageUrl=""),
-    Carta(name="Vision HERO Faris", type="", imageUrl=""),
-    Carta(name="Masked HERO Dark Law", type="", imageUrl=""),
-    Carta(name="Mask Change", type="", imageUrl=""),
-    Carta(name="A Hero Lives", type="", imageUrl=""),
+        Carta(name="Destiny HERO - Malicious", type="", imageUrl=""),
+        Carta(name="Vision HERO Faris", type="", imageUrl=""),
+        Carta(name="Masked HERO Dark Law", type="", imageUrl=""),
+        Carta(name="Mask Change", type="", imageUrl=""),
+        Carta(name="A Hero Lives", type="", imageUrl=""),
 
 // --- Arquetipo "Cyber Dragon" ---
-    Carta(name="Cyber Dragon", type="", imageUrl=""),
-    Carta(name="Cyber Dragon Infinity", type="", imageUrl=""),
-    Carta(name="Chimeratech Fortress Dragon", type="", imageUrl=""),
-    Carta(name="Cyber Emergency", type="", imageUrl=""),
-    Carta(name="Cyber Dragon Nova", type="", imageUrl=""),
+        Carta(name="Cyber Dragon", type="", imageUrl=""),
+        Carta(name="Cyber Dragon Infinity", type="", imageUrl=""),
+        Carta(name="Chimeratech Fortress Dragon", type="", imageUrl=""),
+        Carta(name="Cyber Emergency", type="", imageUrl=""),
+        Carta(name="Cyber Dragon Nova", type="", imageUrl=""),
 
 // --- Cartas "Hand Trap" y Staples Adicionales ---
-    Carta(name="Nibiru, the Primal Being", type="", imageUrl=""),
-    Carta(name="Ghost Ogre & Snow Rabbit", type="", imageUrl=""),
-    Carta(name="D.D. Crow", type="", imageUrl=""),
-    Carta(name="Infinite Impermanence", type="", imageUrl=""),
-    Carta(name="Called by the Grave", type="", imageUrl=""),
-    Carta(name="Crossout Designator", type="", imageUrl=""),
-    Carta(name="Forbidden Droplet", type="", imageUrl=""),
-    Carta(name="Triple Tactics Talent", type="", imageUrl=""),
-    Carta(name="Lightning Storm", type="", imageUrl=""),
-    Carta(name="Evenly Matched", type="", imageUrl=""),
+        Carta(name="Nibiru, the Primal Being", type="", imageUrl=""),
+        Carta(name="Ghost Ogre & Snow Rabbit", type="", imageUrl=""),
+        Carta(name="D.D. Crow", type="", imageUrl=""),
+        Carta(name="Infinite Impermanence", type="", imageUrl=""),
+        Carta(name="Called by the Grave", type="", imageUrl=""),
+        Carta(name="Crossout Designator", type="", imageUrl=""),
+        Carta(name="Forbidden Droplet", type="", imageUrl=""),
+        Carta(name="Triple Tactics Talent", type="", imageUrl=""),
+        Carta(name="Lightning Storm", type="", imageUrl=""),
+        Carta(name="Evenly Matched", type="", imageUrl=""),
 
 // --- Arquetipo "Tearlaments" ---
-    Carta(name="Tearlaments Kitkallos", type="", imageUrl=""),
-    Carta(name="Tearlaments Reinoheart", type="", imageUrl=""),
-    Carta(name="Tearlaments Scheiren", type="", imageUrl=""),
+        Carta(name="Tearlaments Kitkallos", type="", imageUrl=""),
+        Carta(name="Tearlaments Reinoheart", type="", imageUrl=""),
+        Carta(name="Tearlaments Scheiren", type="", imageUrl=""),
 
 // --- Arquetipo "Kashtira" ---
-    Carta(name="Kashtira Fenrir", type="", imageUrl=""),
-    Carta(name="Kashtira Unicorn", type="", imageUrl=""),
-    Carta(name="Kashtira Arise-Heart", type="", imageUrl=""),
-    Carta(name="Number 89: Diablosis the Mind Hacker", type="", imageUrl=""),
+        Carta(name="Kashtira Fenrir", type="", imageUrl=""),
+        Carta(name="Kashtira Unicorn", type="", imageUrl=""),
+        Carta(name="Kashtira Arise-Heart", type="", imageUrl=""),
+        Carta(name="Number 89: Diablosis the Mind Hacker", type="", imageUrl=""),
 
 // --- Arquetipo "Spright" ---
-    Carta(name="Spright Elf", type="", imageUrl=""),
-    Carta(name="Spright Blue", type="", imageUrl=""),
-    Carta(name="Gigantic Spright", type="", imageUrl=""),
+        Carta(name="Spright Elf", type="", imageUrl=""),
+        Carta(name="Spright Blue", type="", imageUrl=""),
+        Carta(name="Gigantic Spright", type="", imageUrl=""),
 
 // --- Arquetipo "Branded" ---
-    Carta(name="Aluber the Jester of Despia", type="", imageUrl=""),
-    Carta(name="Branded Fusion", type="", imageUrl=""),
-    Carta(name="Mirrorjade the Iceblade Dragon", type="", imageUrl=""),
-    Carta(name="Lubellion the Searing Dragon", type="", imageUrl=""),
-    Carta(name="Fallen of Albaz", type="", imageUrl=""),
+        Carta(name="Aluber the Jester of Despia", type="", imageUrl=""),
+        Carta(name="Branded Fusion", type="", imageUrl=""),
+        Carta(name="Mirrorjade the Iceblade Dragon", type="", imageUrl=""),
+        Carta(name="Lubellion the Searing Dragon", type="", imageUrl=""),
+        Carta(name="Fallen of Albaz", type="", imageUrl=""),
 
 // --- Monstruos "Número" (Number) Adicionales ---
-    Carta(name="Number 107: Galaxy-Eyes Tachyon Dragon", type="", imageUrl=""),
-    Carta(name="Number 97: Draglubion", type="", imageUrl=""),
-    Carta(name="Number 100: Numeron Dragon", type="", imageUrl=""),
-    Carta(name="Number 41: Bagooska the Terribly Tired Tapir", type="", imageUrl=""),
-    Carta(name="Number 38: Hope Harbinger Dragon Titanic Galaxy", type="", imageUrl=""),
+        Carta(name="Number 107: Galaxy-Eyes Tachyon Dragon", type="", imageUrl=""),
+        Carta(name="Number 97: Draglubion", type="", imageUrl=""),
+        Carta(name="Number 100: Numeron Dragon", type="", imageUrl=""),
+        Carta(name="Number 41: Bagooska the Terribly Tired Tapir", type="", imageUrl=""),
+        Carta(name="Number 38: Hope Harbinger Dragon Titanic Galaxy", type="", imageUrl=""),
 
 // --- Cartas Variadas y Populares ---
-    Carta(name="Pot of Desires", type="", imageUrl=""),
-    Carta(name="Pot of Extravagance", type="", imageUrl=""),
-    Carta(name="There Can Be Only One", type="", imageUrl=""),
-    Carta(name="Skill Drain", type="", imageUrl=""),
-    Carta(name="Gozen Match", type="", imageUrl=""),
-    Carta(name="Rivalry of Warlords", type="", imageUrl=""),
-    Carta(name="Super Polymerization", type="", imageUrl=""),
-    Carta(name="Dark Ruler No More", type="", imageUrl=""),
-    Carta(name="Fusion Destiny", type="", imageUrl=""),
-    Carta(name="Red-Eyes Dark Dragoon", type="", imageUrl=""),
-    Carta(name="Destiny HERO - Destroyer Phoenix Enforcer", type="", imageUrl=""),
-    Carta(name="Verte Anaconda", type="", imageUrl=""),
-    Carta(name="Zoodiac Drident", type="", imageUrl=""),
-    Carta(name="Elder Entity N'tss", type="", imageUrl=""),
-    Carta(name="Fossil Dyna Pachycephalo", type="", imageUrl="")
+        Carta(name="Pot of Desires", type="", imageUrl=""),
+        Carta(name="Pot of Extravagance", type="", imageUrl=""),
+        Carta(name="There Can Be Only One", type="", imageUrl=""),
+        Carta(name="Skill Drain", type="", imageUrl=""),
+        Carta(name="Gozen Match", type="", imageUrl=""),
+        Carta(name="Rivalry of Warlords", type="", imageUrl=""),
+        Carta(name="Super Polymerization", type="", imageUrl=""),
+        Carta(name="Dark Ruler No More", type="", imageUrl=""),
+        Carta(name="Fusion Destiny", type="", imageUrl=""),
+        Carta(name="Red-Eyes Dark Dragoon", type="", imageUrl=""),
+        Carta(name="Destiny HERO - Destroyer Phoenix Enforcer", type="", imageUrl=""),
+        Carta(name="Verte Anaconda", type="", imageUrl=""),
+        Carta(name="Zoodiac Drident", type="", imageUrl=""),
+        // LÍNEA CORREGIDA: Se añadió la coma al final
+        Carta(name="Elder Entity N'tss", type="", imageUrl=""),
+        Carta(name="Fossil Dyna Pachycephalo", type="", imageUrl=""),
 
-    )
+        )
 }
+

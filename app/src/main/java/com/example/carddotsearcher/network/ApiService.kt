@@ -11,7 +11,7 @@ interface ApiService {
     // Endpoint para obtener todas las cartas o una específica por nombre
     // https://db.ygoprodeck.com/api/v7/cardinfo.php?name=Dark Magician
     @GET("api/v7/cardinfo.php")
-    suspend fun getCardInfo(@Query("name") cardName: String): ApiResponse
+    suspend fun searchCardByName(@Query("name") cardName: String): ApiResponse
 
     @GET("api/v7/randomcard.php")
     suspend fun getRandomCardAsJson(): ResponseBody // Devuelve un elemento JSON genérico
