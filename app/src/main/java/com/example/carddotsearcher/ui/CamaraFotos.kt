@@ -29,6 +29,8 @@ import androidx.core.content.FileProvider
 import com.example.carddotsearcher.R
 import com.example.carddotsearcher.viewmodel.MainViewModel
 import java.io.File
+import android.graphics.ImageDecoder
+import android.os.Build
 
 @Composable
 fun CamaraFotos(viewModel: MainViewModel, onPhotoTaken: () -> Unit) {
@@ -40,7 +42,13 @@ fun CamaraFotos(viewModel: MainViewModel, onPhotoTaken: () -> Unit) {
         ActivityResultContracts.TakePicture()
     ) { success ->
         if (success && imageUri != null) {
-            val bmp = MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
+            val bmp = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val source = ImageDecoder.createSource(context.contentResolver, imageUri!!)
+                ImageDecoder.decodeBitmap(source)
+            } else {
+                @Suppress("DEPRECATION")
+                MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
+            }
             bitmap = bmp
         }
     }
