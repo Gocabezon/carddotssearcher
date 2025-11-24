@@ -74,7 +74,7 @@ fun CartaScreen(navController: NavController, viewModel: CartaViewModel = viewMo
                                 model = carta.imageUrl, // Usa la URL de la carta
                                 contentDescription = "Imagen de la carta ${carta.name}",
                                 placeholder = painterResource(id = R.drawable.dragonblancoojosazules), // Muestra esto mientras carga
-                                error = painterResource(id = R.drawable.dragonblancoojosazules), // Muestra esto si falla la carga
+                                error = painterResource(id = R.drawable.error), // Muestra esto si falla la carga
                                 modifier = Modifier
                                     .size(64.dp)
                                     .clip(RoundedCornerShape(4.dp)),
