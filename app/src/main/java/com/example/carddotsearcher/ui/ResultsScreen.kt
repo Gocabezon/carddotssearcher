@@ -19,7 +19,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import com.example.carddotsearcher.util.calculateDistance
+
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -49,11 +50,7 @@ private fun hasLocationPermission(context: Context): Boolean {
     ) == PackageManager.PERMISSION_GRANTED
 }
 
-private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
-    val results = FloatArray(1)
-    Location.distanceBetween(lat1, lon1, lat2, lon2, results)
-    return results[0] / 1000 // Devuelve la distancia en kilómetros
-}
+
 @Composable
 fun StoresList(
     stores: List<Tienda>,
@@ -107,7 +104,7 @@ fun StoresList(
     }
 }
 
-// ... (funciones auxiliares hasLocationPermission y calculateDistance se mantienen igual)
+
 
 @SuppressLint("MissingPermission")
 @Composable
@@ -192,9 +189,9 @@ fun ResultsScreen(
                     }
                 }
             }
-            // --- FIN DEL CÓDIGO RESTAURADO ---
 
-            // El diálogo para ampliar la imagen se mantiene igual
+
+
             if (showImageDialog && selectedImageRes != null) {
                 Dialog(onDismissRequest = { showImageDialog = false }) {
                     Card(modifier = Modifier.size(300.dp)) {

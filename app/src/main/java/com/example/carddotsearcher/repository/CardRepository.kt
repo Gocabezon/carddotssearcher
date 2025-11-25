@@ -26,7 +26,7 @@ class CardRepository {
             rebeldeInventory.add(
                 InventoryItem(
                     cardName = randomCard.name,
-                    price = Random.nextDouble(1.0, 50.0),
+                    price = Random.nextInt(100, 50000),
                     stock = Random.nextInt(1, 10)
                 )
             )
@@ -38,7 +38,19 @@ class CardRepository {
             metropolisInventory.add(
                 InventoryItem(
                     cardName = randomCard.name,
-                    price = Random.nextDouble(0.5, 60.0),
+                    price = Random.nextInt(300, 60000),
+                    stock = Random.nextInt(1, 5)
+                )
+            )
+        }
+
+        val crustacioInventory = mutableListOf<InventoryItem>()
+        repeat(60) {
+            val randomCard = allMockCards.random()
+            crustacioInventory.add(
+                InventoryItem(
+                    cardName = randomCard.name,
+                    price = Random.nextInt(100, 25000),
                     stock = Random.nextInt(1, 5)
                 )
             )
@@ -58,6 +70,13 @@ class CardRepository {
                 imageRes = R.drawable.tienda2,
                 latitude = -33.44889,
                 longitude = -70.66926
+            ),
+            Tienda(
+                name = "Crustacio cascarudo",
+                inventory = crustacioInventory.distinctBy { it.cardName },
+                imageRes = R.drawable.tienda3,
+                latitude = -35.44889,
+                longitude = -69.66926
             )
         )
     }
