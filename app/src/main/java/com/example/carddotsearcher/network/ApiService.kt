@@ -1,7 +1,7 @@
 // En network/ApiService.kt
 package com.example.carddotsearcher.network
 
-import okhttp3.ResponseBody
+
 
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -13,6 +13,7 @@ interface ApiService {
     @GET("api/v7/cardinfo.php")
     suspend fun searchCardByName(@Query("name") cardName: String): ApiResponse
 
-    @GET("api/v7/randomcard.php")
-    suspend fun getRandomCardAsJson(): ResponseBody // Devuelve un elemento JSON genérico
+    //@GET("api/v7/randomcard.php")
+    //suspend fun getRandomCardAsJson(): ResponseBody // Devuelve un elemento JSON genérico
+    //Esta función ya ha cumplido su cometido, Rest In Peace
 }

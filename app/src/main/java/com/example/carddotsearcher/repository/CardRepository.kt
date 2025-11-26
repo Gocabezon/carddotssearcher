@@ -26,7 +26,7 @@ class CardRepository {
             rebeldeInventory.add(
                 InventoryItem(
                     cardName = randomCard.name,
-                    price = Random.nextInt(100, 50000),
+                    price = Random.nextDouble(100.0, 50000.0),
                     stock = Random.nextInt(1, 10)
                 )
             )
@@ -38,7 +38,7 @@ class CardRepository {
             metropolisInventory.add(
                 InventoryItem(
                     cardName = randomCard.name,
-                    price = Random.nextInt(300, 60000),
+                    price = Random.nextDouble(300.0, 60000.0),
                     stock = Random.nextInt(1, 5)
                 )
             )
@@ -50,7 +50,7 @@ class CardRepository {
             crustacioInventory.add(
                 InventoryItem(
                     cardName = randomCard.name,
-                    price = Random.nextInt(100, 25000),
+                    price = Random.nextDouble(100.0, 25000.0),
                     stock = Random.nextInt(1, 5)
                 )
             )
@@ -75,7 +75,7 @@ class CardRepository {
                 name = "Crustacio cascarudo",
                 inventory = crustacioInventory.distinctBy { it.cardName },
                 imageRes = R.drawable.tienda3,
-                latitude = -35.44889,
+                latitude = -33.44899,
                 longitude = -69.66926
             )
         )

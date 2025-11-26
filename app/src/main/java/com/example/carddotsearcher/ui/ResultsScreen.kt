@@ -4,8 +4,6 @@ package com.example.carddotsearcher.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.pm.PackageManager
 import android.location.Location
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,7 +12,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
+
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -34,7 +32,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.core.content.ContextCompat
+
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.carddotsearcher.R
@@ -43,12 +41,11 @@ import com.example.carddotsearcher.model.Tienda
 import com.example.carddotsearcher.viewmodel.MainViewModel
 import com.google.android.gms.location.LocationServices
 
-private fun hasLocationPermission(context: Context): Boolean {
-    return ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
-}
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.carddotsearcher.ui.shared.LogoutButtonRow
+import com.example.carddotsearcher.viewmodel.AuthViewModel
+
+
 
 
 @Composable
@@ -111,7 +108,8 @@ fun StoresList(
 fun ResultsScreen(
     navController: NavController,
     viewModel: MainViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    authViewModel: AuthViewModel = viewModel()
 ) {
     val foundStores by viewModel.foundStores.observeAsState(emptyList())
     val selectedCard by viewModel.selectedCard.observeAsState()
@@ -133,6 +131,16 @@ fun ResultsScreen(
         }
     }
 
+    val loggedInUser by authViewModel.loggedInUser.collectAsState()
+    LaunchedEffect(loggedInUser) {
+        if (loggedInUser == null) { // Si el usuario logueado es nulo, significa que se cerró la sesión
+            navController.navigate("login") {
+                // Limpiamos toda la pila de navegación para que no se pueda volver atrás
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+            }
+        }
+    }
+
     LaunchedEffect(Unit) {
         locationPermissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION))
     }
@@ -148,6 +156,12 @@ fun ResultsScreen(
                     .padding(vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
+                LogoutButtonRow()
+
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 selectedCard?.let { card ->
                     AsyncImage(
                         model = card.imageUrl,

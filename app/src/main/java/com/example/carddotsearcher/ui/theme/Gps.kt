@@ -45,7 +45,7 @@ fun GPS(navController: NavController, viewModel: MainViewModel) {
     var statusText by remember { mutableStateOf("Toca 'Buscar Tienda Cercana' para empezar.") }
     var expanded by remember { mutableStateOf(false) }
 
-    // --- CAMBIO 1: Obtiene TODAS las tiendas, sin filtrar por un stock que ya no existe. ---
+
     val allStores = remember { viewModel.getAllStores() }
 
     // Launcher para permisos (sin cambios, ya es correcto)

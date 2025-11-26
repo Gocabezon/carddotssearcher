@@ -1,27 +1,64 @@
 package com.example.carddotsearcher.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.carddotsearcher.R
-import com.example.carddotsearcher.repository.UsuarioRepository
+import com.example.carddotsearcher.model.Usuario
+import com.example.carddotsearcher.viewmodel.AuthViewModel
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(
+    navController: NavController,
+    // 1. OBTENEMOS LA INSTANCIA DEL VIEWMODEL CORRECTAMENTE
+    authViewModel: AuthViewModel = viewModel()
+) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf("") }
-    val repository = remember { UsuarioRepository() }
+
+    // Observamos los estados que vienen del ViewModel
+    val authState by authViewModel.authState.collectAsState()
+    val loggedInUser by authViewModel.loggedInUser.collectAsState()
+    val context = LocalContext.current
+
+    // --- EFECTOS SECUNDARIOS: Reaccionan a los cambios de estado ---
+
+    // Efecto para navegar cuando el login/registro sea exitoso
+    LaunchedEffect(loggedInUser) {
+        if (loggedInUser != null) {
+            // Si hay un usuario logueado, navegamos a la cámara y limpiamos la pila de navegación
+            navController.navigate("camera") {
+                popUpTo("login") { inclusive = true }
+            }
+        }
+    }
+
+    // Efecto para mostrar mensajes de error
+    LaunchedEffect(authState) {
+        if (authState == AuthViewModel.AuthState.Error) {
+            Toast.makeText(context, "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show()
+            authViewModel.resetAuthState() // Reseteamos el estado para poder reintentar
+        }
+    }
+
+
+    // --- INTERFAZ DE USUARIO ---
 
     Column(
         modifier = Modifier
@@ -30,8 +67,6 @@ fun LoginScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        Text("Inicio de Sesion", modifier = Modifier.padding(bottom = 24.dp))
 
         Image(
             painter = painterResource(id = R.drawable.carddotsearcher),
@@ -45,10 +80,7 @@ fun LoginScreen(navController: NavController) {
 
         OutlinedTextField(
             value = username,
-            onValueChange = {
-                username = it
-                errorMessage = ""
-            },
+            onValueChange = { username = it },
             label = { Text("Usuario") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -57,59 +89,42 @@ fun LoginScreen(navController: NavController) {
 
         OutlinedTextField(
             value = password,
-            onValueChange = {
-                password = it
-                errorMessage = ""
-            },
+            onValueChange = { password = it },
             label = { Text("Contraseña") },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
 
-        if (errorMessage.isNotEmpty()) {
-            Text(
-                text = errorMessage,
-                color = Color.Red,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-        }
-
         Spacer(Modifier.height(32.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
+        // Si el estado es "Loading", mostramos una rueda de carga
+        if (authState == AuthViewModel.AuthState.Loading) {
+            CircularProgressIndicator()
+        } else {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
 
-            // Botón Iniciar Sesión
-            Button(onClick = {
-                val user = repository.findUser(username, password)
-                if (user != null) {
-                    navController.navigate("camera") {
-                        popUpTo("login") { inclusive = true }
-                    }
-                } else {
-                    errorMessage = "Usuario o contraseña incorrectos"
-                }
-            }) {
-                Text("Iniciar Sesión")
-            }
-            // Botón Registrar
-            Button(onClick = {
-                if (username.isNotEmpty() && password.isNotEmpty()) {
-                    val success = repository.registerUser(username, password)
-                    if (success) {
-                        navController.navigate("camera") {
-                            popUpTo("login") { inclusive = true }
-                        }
+                // Botón Iniciar Sesión
+                Button(onClick = {
+                    if (username.isNotEmpty() && password.isNotEmpty()) {
+                        // 2. DELEGAMOS LA LÓGICA AL VIEWMODEL
+                        authViewModel.login(Usuario(username, password))
                     } else {
-                        errorMessage = "El nombre de usuario ya existe"
+                        Toast.makeText(context, "Rellena todos los campos", Toast.LENGTH_SHORT).show()
                     }
-                } else {
-                    errorMessage = "Usuario y contraseña no pueden estar vacíos"
+                }) {
+                    Text("Iniciar Sesión")
                 }
-            }) {
-                Text("Registrar")
+
+                // Botón Registrar
+                Button(onClick = {
+                    // CAMBIO: Ahora navega a la pantalla de registro
+                    navController.navigate("registro")
+                }) {
+                    Text("ir a Registro")
+                }
             }
         }
     }

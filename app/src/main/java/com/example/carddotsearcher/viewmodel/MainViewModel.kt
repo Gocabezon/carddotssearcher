@@ -9,7 +9,6 @@ import com.example.carddotsearcher.model.Carta
 import com.example.carddotsearcher.model.Tienda
 import com.example.carddotsearcher.repository.CardRepository
 import com.example.carddotsearcher.repository.MockCardDataSource
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
@@ -31,7 +30,7 @@ class MainViewModel : ViewModel() {
     val isLoading: LiveData<Boolean> = _isLoading
 
     private val _photoBitmap = MutableLiveData<Bitmap?>()
-    val photoBitmap: LiveData<Bitmap?> = _photoBitmap
+
 
     fun setPhotoBitmap(bitmap: Bitmap?) {
         _photoBitmap.value = bitmap
@@ -47,19 +46,7 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun searchSpecificCard(card: Carta) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            delay(1500) // Simulate network delay
 
-            _selectedCard.value = card
-
-            val stores = repository.findStoresForCard(card)
-            _foundStores.value = stores
-
-            _isLoading.value = false
-        }
-    }
 
     fun searchCardByName(cardName: String) {
         if (cardName.isBlank()) return

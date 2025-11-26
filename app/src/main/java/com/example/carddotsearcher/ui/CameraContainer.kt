@@ -16,6 +16,7 @@ import com.example.carddotsearcher.viewmodel.MainViewModel
 @Composable
 fun CameraContainer(navController: NavController, viewModel: MainViewModel) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
+
         CamaraFotos(viewModel = viewModel, onPhotoTaken = {
             viewModel.searchRandomCard()
             navController.navigate("results")
@@ -24,5 +25,7 @@ fun CameraContainer(navController: NavController, viewModel: MainViewModel) {
         Button(onClick = { navController.navigate("history") }) {
             Text("Ver Historial")
         }
+
+
     }
 }
